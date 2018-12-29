@@ -1,0 +1,37 @@
+npm install q --save
+
+var qpromise = require('q');
+var fs = require('fs');
+
+qpromise('hello word').then(function (dat) {
+  console.log(dat);
+});
+qpromise.fcall(function () {
+  return 123;
+}).then(function (value) { console.log(value); });
+
+qpromise.nfcall(fs.readFile,__dirname + "/foot.txt","UTF-8").then(function (value) { console.log(value); });
+
+var file_nodes = qpromise.denodeify(fs.readFile);
+file_nodes(__dirname + "/foot.txt","UTF-8").then(function (value) { console.log(value); }).catch(function (reason) { console.log(reason); });
+
+file_deferd = function (filename,encoding) {
+  var deferred = qpromise.defer();
+  fs.readFile(filename,encoding,function (err, data) {
+    if(err){
+      deferred.reject(err);
+    }else{
+      deferred.resolve(data);
+    }
+  });
+  return deferred.promise;
+}
+file_deferd(__dirname + "/foot.txt","utf-8").then(function (value) { console.log(value) }).catch(function (reason) { console.log(reason); });
+
+
+var file_makeNoderesolve = function (filename,encoding) {
+  var deferred = qpromise.defer();
+  fs.readFile(filename, encoding, deferred.makeNodeResolver());
+  return deferred.promise;
+}
+file_makeNoderesolve(__dirname + "/foot.txt","utf-8").then(function (value) { console.log(value); },function (reason) { console.log(reason); });
